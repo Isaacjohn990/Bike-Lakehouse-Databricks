@@ -1,1 +1,32 @@
+#INITIALIZATION
+import pyspark.sql.functions as F
+from pyspark.sql.window import Window
 
+
+#BUSINESS TRANSFORMTION AND MODELLING
+query = """
+SELECT
+  ROW_NUMBER() OVER (ORDER BY ci.customer_id) AS customer_sk,
+  ci.customer_id,
+  ci.customer_key AS source_customer_key,
+  ci.customer_first_name,
+  ci.customer_last_name,
+  ci.marital_status,
+  CASE
+        WHEN ci.gender <> 'n/a' THEN ci.gender
+        ELSE COALESCE(ca.gender, 'n/a')
+  END AS gender,
+  ca.birth_date AS birthdate,
+  ci.create_date AS create_date
+FROM workspace.silver_layer.crm_customers ci
+LEFT JOIN workspace.silver_layer.cust_az12 ca
+    ON ci.customer_key = ca.customer_number
+    LEFT JOIN workspace.silver_layer.erp_customer_location la
+        ON ci.customer_key = la.customer_number
+"""
+
+df = spark.sql(query)
+
+
+#WRITE TO GOLD LAYER
+df.write.mode("overwrite").option("overwriteSchema", "true").format("delta").saveAsTable("workspace.gold_layer.dim_customers")
