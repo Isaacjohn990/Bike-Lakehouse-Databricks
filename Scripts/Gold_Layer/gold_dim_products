@@ -1,1 +1,25 @@
+#BUSINESS TRANSFORMATION AND MODELLING
 
+query = """
+SELECT
+    ROW_NUMBER() OVER (ORDER BY pt.start_date, pt.product_number) AS product_key, -- Surrogate key
+    pt.product_id,
+    pt.product_number,
+    pt.product_name,
+    pc.category_id,
+    pc.category,
+    pc.subcategory,
+    pc.maintenance_flag,
+    pt.product_line,
+    pt.start_date
+FROM workspace.silver_layer.crm_products pt
+LEFT JOIN workspace.silver_layer.erp_product_category pc
+    ON pt.category_id = pc.category_id
+
+--WHERE pt.end_date IS NULL; -- Filter out all historical data
+"""
+df = spark.sql(query)
+
+
+#WRITE TO GOLD LAYER
+df.write.mode("overwrite").format("delta").saveAsTable("workspace.gold_layer.dim_product")
