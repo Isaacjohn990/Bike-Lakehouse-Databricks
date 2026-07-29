@@ -1,1 +1,15 @@
+/*
 
+===========================================================
+--- Loading Prd_info Data into Bronze Layer
+===========================================================
+Reading Data from source and writing to Bronze Delta table
+============================================================
+*/
+
+# read data from source
+df = spark.read.csv(r"/Volumes/workspace/bronze_layer/source_system/Source_crm/prd_info.csv", header = True, inferSchema = True)
+
+
+# write to Bronze table
+df.write.mode("overwrite").saveAsTable("workspace.bronze_layer.prd_info")
