@@ -60,4 +60,4 @@ df = df.withColumn(
 ===============================================
 WRITE TRANSFORMED DATA TO SILVER DELTA TABLE
 ================================================
-df.write.mode("overwrite").format("delta").saveAsTable("workspace.silver_layer.cust_az12")
+df.write.mode("overwrite").format("delta").saveAsTable("Silver_layer.cust_az12")
