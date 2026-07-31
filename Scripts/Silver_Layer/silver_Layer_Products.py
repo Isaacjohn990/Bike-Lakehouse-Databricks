@@ -1,5 +1,5 @@
 ===============================================
---- Intialization
+Intialization
 ===============================================
 
 import pyspark.sql.functions as F
@@ -9,19 +9,19 @@ from pyspark.sql.window import Window
 
 
 =============================================
---- Read From Bronze Delta Table
+Read From Bronze Delta Table
 =============================================
 
 df = spark.read.table("workspace.bronze_layer.prd_info")
 
 
 
-======================================================================
--- Silver Data Transformation
-======================================================================
+=========================================
+Silver Data Transformation
+========================================
 
 ===================================
---- Renaming Columns
+RENAMING COLUMN NAMES
 ===================================
 RENAME_MAP = {
     "prd_id": "product_id",
@@ -37,17 +37,16 @@ for old_name, new_name in RENAME_MAP.items():
     df = df.withColumnRenamed(old_name, new_name)
 
 
-=========================================
---- Trimming all string items
-==========================================
+========================================================
+TRIMMING ALL STRINGS COLUMNS NAMES FOR EASY READABILITY
+========================================================
 for field in df.schema.fields:
     if isinstance(field.dataType, StringType):
         df = df.withColumn(field.name, trim(col(field.name)))
 
 
-
 ======================================================
---- Product Key Parsing
+Product Key Parsing
 ======================================================
 df = df.withColumn("category_id", F.regexp_replace(F.substring(col("product_number"), 1, 5), "-", "_"))
 df = df.withColumn("product_number", F.substring(col("product_number"), 7, F.length(col("product_number"))))
@@ -55,7 +54,7 @@ df = df.withColumn("product_number", F.substring(col("product_number"), 7, F.len
 
 
 =========================================================
---- Product Normalization
+Product Normalization
 =========================================================
 
 df = (
@@ -71,16 +70,11 @@ df = (
     )
 )
 
-=========================================================
---- Date casting
-=========================================================
-
-df = df.withColumn("start_date", col("start_date").cast(DateType()))
 
 
 =========================================================
---- write Transformed Data to silver Delt Table
+write Transformed Data to silver Delta Table
 =========================================================
 
 # Write to silver Table
-df.write.mode("overwrite").option("overwriteSchema", "true").format("delta").saveAsTable("workspace.silver_layer.crm_products")
+df.write.mode("overwrite").option("overwriteSchema", "true").format("delta").saveAsTable("Silver_layer.crm_products")
