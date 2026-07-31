@@ -1,20 +1,21 @@
 =============================================
---- Intialization
+ Intialization
 =============================================
 import pyspark.sql.functions as F
 from pyspark.sql.types import StringType
 from pyspark.sql.functions import trim, col
 
 
+
 =============================================
---- Read From Bronze Delta Table
+Read From Bronze Delta Table
 =============================================
 df = spark.read.table("workspace.bronze_layer.cust_info")
 
 
 
 =============================================
---- Dictionary for the Column renaming
+Dictionary for the Column renaming
 =============================================
 RENAME_MAP = {
     "cst_id": "customer_id",
@@ -27,14 +28,6 @@ RENAME_MAP = {
 }
 for old_name, new_name in RENAME_COLUMNS.items():
     df = df.withColumnRenamed(old_name, new_name)
-
-=============================================
---- Trimming all string Column
-=============================================
-for field in df.schema.fields:
-    if field.dataType == StringType():
-        df = df.withColumn(field.name, trim(col(field.name)))
-
 
 
 =============================================
@@ -68,23 +61,28 @@ for old_name, new_name in RENAME_MAP.items():
 df = df.withColumnRenamed(old_name, new_name)
 
 
+=============================================
+--- Trimming all string Column
+=============================================
+# Trim all string columns
+df = (
+    df.withColumn("customer_key", trim(col("customer_key")))
+      .withColumn("customer_first_name", trim(col("customer_first_name")))
+      .withColumn("customer_last_name", trim(col("customer_last_name")))
+      .withColumn("marital_status", trim(col("marital_status")))
+      .withColumn("gender", trim(col("gender")))
+)
+
+
 =================================================
 --- Removing records with mussing Customers ID
 =================================================
 df = df.filter(col("cst_id").isNotNull())
 
 
-=======================================================================
---- Cast DataTypes 
-=======================================================================
-
-df_typed = df.withColumn("customer_id", col("customer_id").cast("int")) \
-              .withColumn("create_date", col("create_date").cast("date"))
-
-
 
 =============================================================================================
---- Write Transformed Data to Silver Delta Table
+Write Transformed Data to Silver Delta Table
 =============================================================================================
 
-df_typed.write.mode("overwrite").format("delta").saveAsTable("workspace.silver_layer.crm_customers")
+df.write.mode("overwrite").format("delta").saveAsTable("Silver_layer.crm_customers")
