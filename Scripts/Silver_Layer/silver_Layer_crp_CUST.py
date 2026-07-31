@@ -9,7 +9,7 @@ df = spark.table("workspace.bronze_layer.cust_az12")
 
 
 ======================================
--- sILVER DATA TRANSFORMATION
+SILVER DATA TRANSFORMATION
 ======================================
 
 #RENAMING COLUMN NAMES 
@@ -57,6 +57,7 @@ df = df.withColumn(
      .otherwise("unknown")
 )
 
-
-#WRITE TRANSFORMED DATA TO SILVER DELTA TABLE
+===============================================
+WRITE TRANSFORMED DATA TO SILVER DELTA TABLE
+================================================
 df.write.mode("overwrite").format("delta").saveAsTable("workspace.silver_layer.cust_az12")
