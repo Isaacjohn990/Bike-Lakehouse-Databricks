@@ -1,5 +1,5 @@
 ==================================================
--- Initialization
+Initialization
 ==================================================
 
 import pyspark.sql.functions as F
@@ -11,11 +11,11 @@ from pyspark.sql.functions import col, trim, length
 df = spark.read.table("workspace.bronze_layer.sales_details")
 
 
-/*
+
 ==================================================
 SILVER DATA TRANSFORMATION
 ==================================================
-*/
+
 
 #RENAME COLUMN NAMES 
 RENAME_MAP = {
