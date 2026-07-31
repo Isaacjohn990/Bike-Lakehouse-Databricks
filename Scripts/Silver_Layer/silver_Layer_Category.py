@@ -1,4 +1,6 @@
-#INITIALIZATION
+===============
+INITIALIZATION
+===============
 import pyspark.sql.functions as F
 from pyspark.sql.types import StringType, DataType
 from pyspark.sql.functions import col, trim
@@ -36,3 +38,8 @@ df = df.withColumn(
      .when(F.upper(col("maintenance")) == "NO", F.lit(False))
      .otherwise(None)
 )
+
+==============================================
+WRITE TRANSFORMED DATA INTO SILVER DELTA TABLE
+==============================================
+ df.write.mode("overwrite").format("delta").saveAsTable("Silver_layer.erp_product_category")
