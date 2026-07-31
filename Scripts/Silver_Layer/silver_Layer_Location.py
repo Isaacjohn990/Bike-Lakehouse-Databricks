@@ -9,7 +9,7 @@ df = spark.table("workspace.bronze_layer.loc_a101")
 
 
 ===========================================
---- SILVER DATA TRANSFORMATION
+SILVER DATA TRANSFORMATION
 ============================================
 
 #RENAME COLUMN NAMES FOR EASY READABILITY
@@ -40,6 +40,7 @@ df = df.withColumn(
      .otherwise(col("CNTRY"))
 )
 
-
-#WRITE TRANSFORMED DATA TO SILVER DELTA TABLE
-df.write.mode("overwrite").format("delta").saveAsTable("workspace.silver_layer.erp_customer_location")
+================================================
+WRITE TRANSFORMED DATA TO SILVER DELTA TABLE
+==============================================
+df.write.mode("overwrite").format("delta").saveAsTable("Silver_layer.erp_customer_location")
